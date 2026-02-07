@@ -5,7 +5,19 @@ import { Folder, Mail, Palette } from 'lucide-react';
 const PixelDesktop = () => {
     const [noCount, setNoCount] = useState(0);
     const [yesPressed, setYesPressed] = useState(false);
+    const [celebrationGif, setCelebrationGif] = useState("https://media.tenor.com/gUiu1zyxfzYAAAAi/bear-kiss-bear-kisses.gif");
+    const [showFinalMessage, setShowFinalMessage] = useState(false);
     const [noButtonPos, setNoButtonPos] = useState({ x: 0, y: 0 });
+
+    useEffect(() => {
+        if (yesPressed) {
+            const timer = setTimeout(() => {
+                setCelebrationGif("/alex-geerken-geerken.gif");
+                setShowFinalMessage(true);
+            }, 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [yesPressed]);
 
     // Phrases that cycle when the "No" button is hovered/clicked
     const phrases = [
@@ -14,17 +26,16 @@ const PixelDesktop = () => {
         "Really sure?",
         "Think again!",
         "Last chance!",
-        "Surely not?",
         "You might regret this!",
+        "Mommy please ;_;",
         "Give it another thought!",
-        "Authe you absolutely certain?",
         "This could be a mistake!",
         "Have a heart!",
         "Don't be so cold!",
         "Change of heart?",
         "Wouldn't you reconsider?",
-        "Is that your final answer?",
         "You're breaking my heart ;_;",
+        "Please say yes!"
     ];
 
     const getNoButtonText = () => {
@@ -33,8 +44,14 @@ const PixelDesktop = () => {
 
     const handleNoInteraction = () => {
         setNoCount(noCount + 1);
-        const x = Math.random() * (window.innerWidth - 100) - (window.innerWidth / 2) + 50;
-        const y = Math.random() * (window.innerHeight - 100) - (window.innerHeight / 2) + 50;
+        // Limit movement to avoid going off-screen. 
+        // We use a max range of 300px or half the screen width/height, whichever is smaller.
+        const maxMoveX = Math.min(window.innerWidth / 2 - 50, 300);
+        const maxMoveY = Math.min(window.innerHeight / 2 - 50, 300);
+
+        const x = (Math.random() - 0.5) * 2 * maxMoveX;
+        const y = (Math.random() - 0.5) * 2 * maxMoveY;
+
         setNoButtonPos({ x, y });
     };
 
@@ -98,11 +115,24 @@ const PixelDesktop = () => {
                 <div className="p-3 md:p-8 flex flex-col md:flex-row items-center gap-6">
 
                     {yesPressed ? (
-                        <div className="w-full h-full flex flex-col items-center justify-center p-10 text-center animate-pulse">
+                        <div className="w-full h-full flex flex-col items-center justify-center p-10 text-center animate-pulse relative">
+                            {showFinalMessage && (
+                                <div className="absolute top-10 md:top-20 z-50 animate-bounce">
+                                    <div className="bg-white border-4 border-[#F48FB1] p-4 rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] relative">
+                                        <p className="text-xl md:text-3xl font-bold text-[#AD1457] whitespace-nowrap">
+                                            Now you are mine FOREVER!
+                                        </p>
+                                        {/* Speech Bubble Tail */}
+                                        <div className="absolute bottom-[-12px] left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[10px] border-l-transparent border-t-[12px] border-t-[#F48FB1] border-r-[10px] border-r-transparent"></div>
+                                        <div className="absolute bottom-[-6px] left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[6px] border-l-transparent border-t-[8px] border-t-white border-r-[6px] border-r-transparent"></div>
+                                    </div>
+                                </div>
+                            )}
+
                             <h1 className="text-4xl md:text-6xl text-[#E91E63] font-bold mb-4">YAY!!!</h1>
                             <p className="text-2xl text-[#880E4F]">Best Valentine Ever! ❤️</p>
                             <img
-                                src="https://media.tenor.com/gUiu1zyxfzYAAAAi/bear-kiss-bear-kisses.gif"
+                                src={celebrationGif}
                                 alt="Celebration"
                                 className="mt-8 rounded-lg border-4 border-[#F48FB1]"
                             />
